@@ -1,4 +1,6 @@
 import { createContext, useContext, useState } from "react";
+import { getChats } from "../services/chatService";
+import { showError } from "../utils/utils";
 
 const ChatContext = createContext();
 
@@ -10,6 +12,15 @@ const ChatProvider = ({ children }) => {
   const handleChatSelect = (chat) => setSelectedChat(chat);
   const handleSetChats = (chats) => setChats(chats);
 
+  const fetchChats = async () => {
+    try {
+      const { data } = await getChats();
+      handleSetChats(data);
+    } catch (error) {
+      showError(error);
+    }
+  };
+
   return (
     <ChatContext.Provider
       value={{
@@ -17,6 +28,7 @@ const ChatProvider = ({ children }) => {
         handleChatSelect,
         chats,
         handleSetChats,
+        fetchChats,
       }}
     >
       {children}

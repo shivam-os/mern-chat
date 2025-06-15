@@ -4,9 +4,8 @@ import Button from "../global/Button";
 import { toast } from "react-toastify";
 import FormInput from "../global/FormInput";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../../services/authService";
+import { loginUser, loginGuestUser } from "../../services/authService";
 import { showError } from "../../utils/utils";
-import { useAuth } from "../../contexts/AuthContext.jsx";
 import { PAGE_URLS } from "../../config/app.config.js";
 
 const Login = () => {
@@ -17,7 +16,6 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,8 +41,8 @@ const Login = () => {
     try {
       const data = await loginUser({ email, password });
       toast.success(data.message);
-      login(data.data);
       localStorage.setItem("userToken", data.data.token);
+      localStorage.setItem("user", JSON.stringify(data.data));
       navigate(PAGE_URLS.CHAT);
     } catch (error) {
       showError(error);
@@ -53,12 +51,18 @@ const Login = () => {
     }
   };
 
-  const handleGuestLogin = () => {
-    setFormData((prev) => ({
-      ...prev,
-      email: "guest@example.com",
-      password: "123456",
-    }));
+  const handleGuestLogin = async () => {
+    try {
+      const data = await loginGuestUser();
+      toast.success(data.message);
+      localStorage.setItem("userToken", data.data.token);
+      localStorage.setItem("user", JSON.stringify(data.data));
+      navigate(PAGE_URLS.CHAT);
+    } catch (error) {
+      showError(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,6 +78,7 @@ const Login = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder="Enter your email address"
+            className="mb-2"
           />
 
           <Form.Group className="mb-3">
@@ -104,7 +109,7 @@ const Login = () => {
           </Button>
 
           <Button variant="danger" className="w-100" onClick={handleGuestLogin}>
-            Get Guest User Credentials
+            Login As Guest User
           </Button>
         </Form>
       </div>

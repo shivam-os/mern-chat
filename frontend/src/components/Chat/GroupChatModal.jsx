@@ -5,14 +5,13 @@ import { createNewChat } from "../../services/chatService";
 import { showError } from "../../utils/utils";
 import { toast } from "react-toastify";
 import { getAllUsers } from "../../services/userService";
-import { useAuth } from "../../contexts/AuthContext.jsx";
 
 const getUser = (user) => {
-  return [{ label: user.name, value: user.id }];
+  return [{ label: user.name, value: user.id, isFixed: true }];
 };
 
 const GroupChatModal = ({ show, handleClose }) => {
-  const { user } = useAuth();
+  const user = JSON.parse(localStorage.getItem("user")) ?? [];
   const [groupName, setGroupName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState(() => getUser(user));
 
@@ -31,9 +30,22 @@ const GroupChatModal = ({ show, handleClose }) => {
     }
   };
 
+  const handleChange = (newValue, actionMeta) => {
+    if (
+      actionMeta.action === "remove-value" ||
+      actionMeta.action === "pop-value"
+    ) {
+      const removed = actionMeta.removedValue;
+      if (removed?.isFixed) {
+        return;
+      }
+    }
+    setSelectedUsers(newValue);
+  };
+
   const handleSubmit = async () => {
-    if (!groupName.trim() || selectedUsers.length === 0) {
-      return showError("Please provide a group name and select users.");
+    if (!groupName.trim() || selectedUsers.length === 1) {
+      return toast.warn("Please provide a group name and select users.");
     }
 
     const payload = {
@@ -52,7 +64,7 @@ const GroupChatModal = ({ show, handleClose }) => {
   };
 
   return (
-    <Modal show={show} onHide={handleClose} centered>
+    <Modal show={show} onHide={handleClose} centered className="primary-font">
       <Modal.Header closeButton>
         <Modal.Title>Create Group Chat</Modal.Title>
       </Modal.Header>
@@ -72,7 +84,7 @@ const GroupChatModal = ({ show, handleClose }) => {
           <AsyncMultiSelect
             loadOptions={loadUserOptions}
             value={selectedUsers}
-            onChange={setSelectedUsers}
+            onChange={handleChange}
             placeholder="Search users..."
           />
         </Form.Group>

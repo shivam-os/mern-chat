@@ -5,14 +5,16 @@ import Button from "../global/Button";
 import FormInput from "../global/FormInput";
 import { getRandomBgColor, showError } from "../../utils/utils";
 import { getAllUsers } from "../../services/userService";
+import { toast } from "react-toastify";
+import { createNewChat } from "../../services/chatService";
 
-const UserCard = ({ user }) => {
+const UserCard = ({ user, onUserClick }) => {
   return (
     <Card className="mb-2 px-3" style={{ width: "100%" }}>
       <div className="d-flex align-items-center justify-content-between p-2">
         <div className="d-flex align-items-center" style={{ gap: "12px" }}>
           <div
-            className="rounded-circle text-white d-flex align-items-center justify-content-center"
+            className="rounded-circle text-white d-flex align-items-center justify-content-center font-primary"
             style={{
               backgroundColor: getRandomBgColor(),
               width: "40px",
@@ -24,42 +26,70 @@ const UserCard = ({ user }) => {
             {user.name.charAt(0).toUpperCase()}
           </div>
           <div className="d-flex flex-column">
-            <span>{user.name}</span>
+            <span className="font-primary" style={{ fontWeight: "500" }}>
+              {user.name}
+            </span>
             <small className="text-muted">{user.email}</small>
           </div>
         </div>
 
-        <BsFillSendFill color="green" size={18} />
+        <BsFillSendFill
+          color="green"
+          size={18}
+          style={{ cursor: "pointer" }}
+          onClick={() => onUserClick(user)}
+        />
       </div>
     </Card>
   );
 };
 
-const AllUsersModal = ({ show, handleClose, onSearch }) => {
+const AllUsersModal = ({ show, handleClose }) => {
   const [searchText, setSearchText] = useState("");
   const [allUsers, setAllUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSearch = () => {
+  const fetchUsers = async (payload) => {
+    try {
+      setIsLoading(true);
+      const response = await getAllUsers(payload);
+      setAllUsers(response.data);
+    } catch (err) {
+      showError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUserClick = async (user) => {
+    const payload = {
+      name: user.name,
+      isGroup: false,
+      users: [user.id],
+    };
+
+    try {
+      const response = await createNewChat(payload);
+      toast.success(response.message);
+      handleClose();
+    } catch (err) {
+      showError(err);
+    }
+  };
+
+  const handleSearch = async () => {
     if (!searchText.trim()) return;
-    onSearch(searchText);
+    await fetchUsers(searchText);
   };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await getAllUsers();
-        setAllUsers(response.data);
-      } catch (err) {
-        showError(err);
-      }
-    };
     fetchUsers();
   }, []);
 
   return (
     <Modal show={show} size="md" onHide={handleClose} centered scrollable>
-      <Modal.Header closeButton>
-        <Modal.Title>Search Users</Modal.Title>
+      <Modal.Header closeButton className="primary-font">
+        <Modal.Title className="font-weight-bold">Search Users</Modal.Title>
       </Modal.Header>
 
       <Modal.Body className="d-flex flex-column">
@@ -81,9 +111,13 @@ const AllUsersModal = ({ show, handleClose, onSearch }) => {
           </Button>
         </div>
 
-        {allUsers.map((user) => (
-          <UserCard key={user.id} user={user} />
-        ))}
+        {isLoading ? (
+          <p>Loading....</p>
+        ) : (
+          allUsers.map((user) => (
+            <UserCard key={user.id} user={user} onUserClick={handleUserClick} />
+          ))
+        )}
       </Modal.Body>
     </Modal>
   );

@@ -14,8 +14,8 @@ function Home() {
 
   return (
     <Container className="d-flex flex-column align-items-center mt-5">
-      <Card className="w-100 text-center p-3 mb-4 shadow-sm">
-        <h1 className="display-5 fw-semibold">Chat App</h1>
+      <Card className="w-100 text-center p-3 mb-4 shadow-sm primary-green">
+        <h1 className="display-5 fw-semibold">ByteChat</h1>
       </Card>
 
       <Card className="w-100 p-4 shadow-sm">
@@ -24,6 +24,7 @@ function Home() {
           onSelect={(k) => setActiveTab(k)}
           id="auth-tabs"
           justify
+          className="primary-font font-weight-bold"
         >
           <Tab eventKey="login" title="Login">
             <Login />

@@ -5,13 +5,12 @@ import io from "socket.io-client";
 import { toast } from "react-toastify";
 import { SOCKET_URL } from "../../config/app.config";
 import { useChats } from "../../contexts/ChatsContext";
-import { useAuth } from "../../contexts/AuthContext";
 import { deleteChat } from "../../services/chatService";
 import { showError } from "../../utils/utils";
 
 const SingleChat = () => {
-  const { selectedChat, handleChatSelect } = useChats();
-  const { user } = useAuth();
+  const { selectedChat, handleChatSelect, fetchChats } = useChats();
+  const user = JSON.parse(localStorage.getItem("user")) ?? {};
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const socket = useRef(null);
@@ -22,6 +21,7 @@ const SingleChat = () => {
       const response = await deleteChat(id);
       toast.success(response.message);
       handleChatSelect(null);
+      await fetchChats();
     } catch (err) {
       showError(err);
     }
@@ -66,83 +66,102 @@ const SingleChat = () => {
   }, [messages]);
 
   return (
-    <div className="w-100">
-      <div className="d-flex align-items-center justify-content-between mb-3">
-        <div className="d-flex align-items-center">
-          <BsArrowLeft
-            size={24}
-            style={{ cursor: "pointer", marginRight: "10px" }}
-            onClick={() => handleChatSelect(null)}
+    <div
+      style={{
+        display: selectedChat ? "flex" : "none",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "1rem",
+        backgroundColor: "white",
+        width: "100%",
+        borderRadius: "0.5rem",
+        border: "1px solid #ccc",
+      }}
+    >
+      <div className="w-100">
+        <div className="d-flex align-items-center justify-content-between mb-3">
+          <div className="d-flex align-items-center">
+            <BsArrowLeft
+              size={24}
+              style={{ cursor: "pointer", marginRight: "10px" }}
+              onClick={() => handleChatSelect(null)}
+            />
+            <h5 className="mb-0">{selectedChat?.name}</h5>
+          </div>
+
+          <BsFillTrash3Fill
+            size={18}
+            color="red"
+            style={{ cursor: "pointer" }}
+            onClick={() => handleChatDelete(selectedChat?.id)}
           />
-          <h5 className="mb-0">{selectedChat?.name}</h5>
         </div>
 
-        <BsFillTrash3Fill
-          size={18}
-          color="red"
-          style={{ cursor: "pointer" }}
-          onClick={() => handleChatDelete(selectedChat?.id)}
-        />
-      </div>
-
-      <div
-        className="p-3 bg-light rounded"
-        style={{
-          height: "80vh",
-          display: "flex",
-          flexDirection: "column",
-          overflowY: "hidden",
-        }}
-      >
         <div
-          className="flex-grow-1 overflow-auto mb-2 d-flex flex-column"
-          style={{ maxHeight: "100%", overflowY: "auto" }}
-          ref={messagesContainerRef}
+          className="p-3 bg-light rounded"
+          style={{
+            height: "70vh",
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "hidden",
+          }}
         >
-          {messages.map((msg, idx) => {
-            const isSender = msg?.sender?.id === user?.id;
+          <div
+            className="flex-grow-1 overflow-auto mb-2 d-flex flex-column"
+            style={{ maxHeight: "100%", overflowY: "auto" }}
+            ref={messagesContainerRef}
+          >
+            {messages.map((msg, idx) => {
+              const isSender = msg?.sender?.id === user?.id;
 
-            return (
-              <div
-                key={idx}
-                className={`d-flex ${
-                  isSender ? "justify-content-end" : "justify-content-start"
-                } mb-2`}
-              >
+              return (
                 <div
-                  className={`p-2 rounded ${
-                    isSender ? "bg-primary text-white" : "bg-white text-dark"
-                  }`}
-                  style={{
-                    maxWidth: "70%",
-                    wordBreak: "break-word",
-                  }}
+                  key={idx}
+                  className={`d-flex ${
+                    isSender ? "justify-content-end" : "justify-content-start"
+                  } mb-2`}
                 >
-                  <div style={{ fontSize: "0.9rem" }}>{msg?.content}</div>
                   <div
+                    className={`p-2 rounded ${
+                      isSender
+                        ? "sender-color text-white"
+                        : "bg-white text-dark"
+                    }`}
                     style={{
-                      fontSize: "0.7rem",
-                      textAlign: "right",
-                      color: isSender ? "white" : "#666",
+                      maxWidth: "70%",
+                      wordBreak: "break-word",
                     }}
                   >
-                    {new Date(msg?.timestamp).toLocaleTimeString()}
+                    <div style={{ fontSize: "0.9rem" }}>{msg?.content}</div>
+                    <div
+                      style={{
+                        fontSize: "0.7rem",
+                        textAlign: "right",
+                        color: isSender ? "white" : "#666",
+                      }}
+                    >
+                      {new Date(msg?.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
 
-        <Form onSubmit={sendMessage}>
-          <Form.Control
-            type="text"
-            placeholder="Enter a message..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            className="bg-secondary-subtle"
-          />
-        </Form>
+          <Form onSubmit={sendMessage}>
+            <Form.Control
+              type="text"
+              placeholder="Enter a message..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              className="bg-secondary-subtle"
+            />
+          </Form>
+        </div>
       </div>
     </div>
   );

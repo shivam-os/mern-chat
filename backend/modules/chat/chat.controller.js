@@ -11,14 +11,7 @@ export const getAllChats = async (req, res, next) => {
     })
       .populate("admin", "-password")
       .populate("users", "-password")
-      // .populate({
-      //   path: "latestMessage",
-      //   populate: {
-      //     path: "sender",
-      //     select: "name email",               // populate message sender details
-      //   },
-      // })
-      .sort({ updatedAt: -1 }); // recent chats first
+      .sort({ updatedAt: -1 });
 
     res.status(200).json(new ApiResponse(200, null, chats));
   } catch (error) {

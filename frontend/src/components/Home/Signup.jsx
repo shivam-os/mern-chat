@@ -63,6 +63,7 @@ const Signup = ({ onSignupSuccess }) => {
             value={formData.name}
             onChange={handleChange}
             placeholder="Enter your name"
+            className="mb-2"
           />
 
           <FormInput
@@ -71,6 +72,7 @@ const Signup = ({ onSignupSuccess }) => {
             value={formData.email}
             onChange={handleChange}
             placeholder="Enter your email address"
+            className="mb-2"
           />
 
           <Form.Group className="mb-3">
@@ -94,7 +96,7 @@ const Signup = ({ onSignupSuccess }) => {
           <Button
             type="submit"
             variant="primary"
-            className="w-100 mb-2"
+            className="w-100 mb-2 primary-black"
             disabled={loading}
           >
             {loading ? "Signing in..." : "Signup"}

@@ -18,7 +18,7 @@ const Button = ({
       disabled={disabled}
       size={size}
       className={className}
-      {...[props]}
+      {...props}
     >
       {children}
     </RButton>

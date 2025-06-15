@@ -1,5 +1,5 @@
 import express from "express";
-import { loginUser, logoutUser, signupUser } from "./auth.controller.js";
+import { guestUserLogin, loginUser, signupUser } from "./auth.controller.js";
 import { validationHandler } from "../../middlewares/validationHandler.js";
 import { loginSchema, signupSchema } from "./auth.validator.js";
 import { REQ } from "../../config/constants.js";
@@ -12,4 +12,4 @@ authRoutes.post(
   validationHandler(signupSchema, REQ.BODY),
   signupUser
 );
-authRoutes.post("/logout", logoutUser);
+authRoutes.post("/guestUserLogin", guestUserLogin);

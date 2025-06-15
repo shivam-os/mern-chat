@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import http from "http";
+import "dotenv/config";
 import { appRoutes } from "./routes/index.js";
 import { connectToDB } from "./config/database.js";
 import { errorHandler } from "./middlewares/errorHandler.js";

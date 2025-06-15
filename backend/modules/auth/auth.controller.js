@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import axios from "axios";
 import { User } from "../user/user.model.js";
 import { ApiError } from "../../helpers/ApiError.js";
 import { ApiResponse } from "../../helpers/ApiResponse.js";
@@ -68,4 +69,22 @@ export const loginUser = async (req, res, next) => {
   }
 };
 
-export const logoutUser = () => {};
+export const guestUserLogin = async (req, res, next) => {
+  try {
+    const guestCredentials = {
+      email: "guest@example.com",
+      password: "guest123",
+    };
+
+    const response = await axios.post(
+      `${process.env.BASE_URL_BACKEND}/auth/login`,
+      guestCredentials
+    );
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Welcome again!", response.data.data));
+  } catch (err) {
+    next(err);
+  }
+};
