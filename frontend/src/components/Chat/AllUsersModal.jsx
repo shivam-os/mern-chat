@@ -7,6 +7,7 @@ import { getRandomBgColor, showError } from "../../utils/utils";
 import { getAllUsers } from "../../services/userService";
 import { toast } from "react-toastify";
 import { createNewChat } from "../../services/chatService";
+import { useChats } from "../../contexts/ChatsContext";
 
 const UserCard = ({ user, onUserClick }) => {
   return (
@@ -48,6 +49,8 @@ const AllUsersModal = ({ show, handleClose }) => {
   const [searchText, setSearchText] = useState("");
   const [allUsers, setAllUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const loggedInUser = JSON.parse(localStorage.getItem("user")) ?? {};
+  const { handleChatSelect } = useChats();
 
   const fetchUsers = async (payload) => {
     try {
@@ -65,12 +68,14 @@ const AllUsersModal = ({ show, handleClose }) => {
     const payload = {
       name: user.name,
       isGroup: false,
-      users: [user.id],
+      admin: loggedInUser?.id,
+      users:
+        loggedInUser?.id !== user.id ? [user.id, loggedInUser.id] : [user.id],
     };
-
     try {
       const response = await createNewChat(payload);
       toast.success(response.message);
+      handleChatSelect(null);
       handleClose();
     } catch (err) {
       showError(err);

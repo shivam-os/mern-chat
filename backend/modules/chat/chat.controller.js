@@ -26,15 +26,29 @@ export const createNewChat = async (req, res, next) => {
     const { users, name, isGroup } = req.body;
     const admin = req.user.id;
 
-    // Add admin to users list if not already present
+    // Ensure admin (sender) is in the users list
     if (!users.includes(admin)) {
       users.push(admin);
     }
 
+    if (!isGroup) {
+      // For 1-on-1
+      const existingChat = await Chat.findOne({
+        isGroup: false,
+        users: { $all: users, $size: 2 },
+      });
+
+      if (existingChat) {
+        throw new ApiError(409, "Chat already exists!");
+      }
+    }
+
+    // Create new chat
     const newChat = await Chat.create({
       name,
       isGroup,
       users,
+      admin,
     });
 
     const fullChat = await Chat.findById(newChat._id)

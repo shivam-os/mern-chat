@@ -144,7 +144,8 @@ const SingleChat = () => {
                         hour: "2-digit",
                         minute: "2-digit",
                         hour12: true,
-                      })}
+                      })}{" "}
+                      - By {msg?.sender?.name}
                     </div>
                   </div>
                 </div>

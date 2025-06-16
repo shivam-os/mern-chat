@@ -5,6 +5,7 @@ import { createNewChat } from "../../services/chatService";
 import { showError } from "../../utils/utils";
 import { toast } from "react-toastify";
 import { getAllUsers } from "../../services/userService";
+import { useChats } from "../../contexts/ChatsContext.jsx";
 
 const getUser = (user) => {
   return [{ label: user.name, value: user.id, isFixed: true }];
@@ -14,6 +15,7 @@ const GroupChatModal = ({ show, handleClose }) => {
   const user = JSON.parse(localStorage.getItem("user")) ?? [];
   const [groupName, setGroupName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState(() => getUser(user));
+  const { handleChatSelect } = useChats();
 
   const loadUserOptions = async (inputValue) => {
     if (!inputValue) return [];
@@ -51,12 +53,14 @@ const GroupChatModal = ({ show, handleClose }) => {
     const payload = {
       name: groupName,
       isGroup: true,
+      admin: user?.id,
       users: selectedUsers.map((u) => u.value),
     };
 
     try {
       const response = await createNewChat(payload);
       toast.success(response.message);
+      handleChatSelect(null);
       handleClose();
     } catch (err) {
       showError(err);

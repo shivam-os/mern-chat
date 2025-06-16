@@ -26,6 +26,10 @@ export const createChatSchema = Joi.object({
     "string.empty": `"name" cannot be empty`,
     "any.required": `"name" is required`,
   }),
+  admin: objectId.required().messages({
+    "any.required": `"admin" is required`,
+    "any.invalid": `"admin" must be a valid ObjectId`,
+  }),
   isGroup: Joi.boolean().required().messages({
     "any.required": `"isGroup" is required`,
     "boolean.base": `"isGroup" must be a boolean`,
