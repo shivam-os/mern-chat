@@ -29,3 +29,11 @@ export const debounce = (callback, delay) => {
     }, delay);
   };
 };
+
+export const getChatName = (chat, currentUser) => {
+  if (!chat?.isGroup && currentUser === chat?.name && chat?.users?.length > 1) {
+    return chat.users[1]?.name ?? "";
+  }
+  return chat?.name ?? "";
+};
+
