@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { SOCKET_URL } from "../../config/app.config";
 import { useChats } from "../../contexts/ChatsContext";
 import { deleteChat } from "../../services/chatService";
-import { showError } from "../../utils/utils";
+import { getChatName, showError } from "../../utils/utils";
 
 const SingleChat = () => {
   const { selectedChat, handleChatSelect, fetchChats } = useChats();
@@ -15,6 +15,7 @@ const SingleChat = () => {
   const [messages, setMessages] = useState([]);
   const socket = useRef(null);
   const messagesContainerRef = useRef(null);
+const chatName = getChatName(selectedChat, user.name);
 
   const handleChatDelete = async (id) => {
     try {
@@ -86,7 +87,7 @@ const SingleChat = () => {
               style={{ cursor: "pointer", marginRight: "10px" }}
               onClick={() => handleChatSelect(null)}
             />
-            <h5 className="mb-0">{selectedChat?.name}</h5>
+            <h5 className="mb-0">{chatName}</h5>
           </div>
 
           <BsFillTrash3Fill
