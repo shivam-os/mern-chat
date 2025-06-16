@@ -5,8 +5,11 @@ import { useChats } from "../../contexts/ChatsContext";
 import Button from "../global/Button";
 import AllUsersModal from "./AllUsersModal";
 import GroupChatModal from "./GroupChatModal";
+import { getChatName } from "../../utils/utils";
 
-const GroupCard = ({ group, onClick, selectedChat }) => {
+const GroupCard = ({ group, onClick, selectedChat, currentUser}) => {
+const chatName = getChatName(group, currentUser.name);
+
   return (
     <Card
       className={`mb-2 px-3 text-truncate ${
@@ -27,10 +30,10 @@ const GroupCard = ({ group, onClick, selectedChat }) => {
               fontWeight: "bold",
             }}
           >
-            {group.name.charAt(0).toUpperCase()}
+             {chatName.charAt(0).toUpperCase()}
           </div>
 
-          <span className="primary-font text-truncate">{group.name}</span>
+          <span className="primary-font text-truncate">{chatName}</span>
         </div>
       </div>
     </Card>
@@ -40,6 +43,7 @@ const GroupCard = ({ group, onClick, selectedChat }) => {
 const MyChats = () => {
   const { selectedChat, handleChatSelect, chats, fetchChats } = useChats();
   const [isGroupChatModal, setIsGroupChatModal] = useState(false);
+const currentUser = JSON.parse(localStorage.getItem("user")) ?? {};
 
   const openGroupChatModal = () => setIsGroupChatModal(true);
   const closeGroupModal = async () => {
@@ -85,7 +89,7 @@ const MyChats = () => {
                 key={chat.id}
                 group={chat}
                 onClick={handleChatSelect}
-                selectedChat={selectedChat}
+               currentUser={currentUser} selectedChat={selectedChat}
               />
             ))
           ) : (
