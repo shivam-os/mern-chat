@@ -19,7 +19,7 @@ To run ByteChat on your local machine, follow these steps:
 MONGO_URI=your_mongo_connection_string
 JWT_SECRET=your_jwt_secret_key
 JWT_EXPIRES_IN=1d
-BASE_URL_BACKEND=http://localhost:3003
+BASE_URL_BACKEND=http://localhost:3003/api/v1
 
 ---
 
