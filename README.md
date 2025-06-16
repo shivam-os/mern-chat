@@ -2,6 +2,8 @@
 
 ByteChat is a real-time chat application built using the MERN stack (MongoDB, Express, React, Node.js) with Socket.IO for instant messaging.
 
+Currently it's not mobile responsive.
+
 🚀 **Live Demo**: [https://mern-chat-frontend-n3z6.onrender.com](https://mern-chat-frontend-n3z6.onrender.com)
 
 ---
