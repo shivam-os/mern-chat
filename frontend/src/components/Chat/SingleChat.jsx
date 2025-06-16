@@ -44,6 +44,7 @@ const chatName = getChatName(selectedChat, user.name);
   };
 
   useEffect(() => {
+setMessages([]);
     socket.current = io(SOCKET_URL, {
       auth: { token: localStorage.getItem("userToken") },
     });
